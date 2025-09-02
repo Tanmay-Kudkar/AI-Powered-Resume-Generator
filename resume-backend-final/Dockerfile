@@ -4,14 +4,20 @@ FROM eclipse-temurin:21-jdk-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy Maven wrapper and project files
+# Copy all backend files
 COPY . .
 
-# Build the project
+# Give execute permission to Maven wrapper
+RUN chmod +x mvnw
+
+# Build the project (skip tests)
 RUN ./mvnw clean package -DskipTests
 
-# Expose port (Spring Boot default)
+# Expose Spring Boot port
 EXPOSE 8080
 
+# Ensure Spring Boot listens on all interfaces
+ENV JAVA_OPTS="-Dserver.address=0.0.0.0"
+
 # Start the application
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["sh", "-c", "java $JAVA_OPTS -jar target/*.jar"]
