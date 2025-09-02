@@ -59,7 +59,7 @@ public class ResumeServiceImpl implements ResumeService {
                 "3. Follow this structure exactly: {\"personalInformation\":{\"fullName\":\"\",\"email\":\"\",\"phoneNumber\":\"\"},\"summary\":\"\",\"skills\":[{\"title\":\"\",\"level\":\"\"}],...}";
 
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "deepseek/deepseek-chat-v3.1:free");
+        requestBody.put("model", "openai/gpt-oss-120b:free");
 
         JSONArray messages = new JSONArray();
         messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
