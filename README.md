@@ -153,7 +153,7 @@ Tip: Iterate! Tweak your inputs for more tailored results.
 
 ### Backend (Render example)
 
-- Environment: Java 17
+- Environment: Java 21 Used
 - Build Command: `mvn clean package -DskipTests`
 - Start Command: `java -jar target/*.jar`
 - Env Vars: `GEMINI_API_KEY`, `PORT` (Render provides a PORT)
