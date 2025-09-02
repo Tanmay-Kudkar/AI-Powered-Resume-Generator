@@ -19,109 +19,120 @@ import java.util.Map;
 @Service
 public class ResumeServiceImpl implements ResumeService {
 
-    private final String openRouterApiUrl = "https://openrouter.ai/api/v1/chat/completions";
-    private final String openRouterApiKey;
-
-    public ResumeServiceImpl() {
-        // 1. Try environment variable first (Render / prod)
-        String key = System.getenv("OPENROUTER_API_KEY");
-
-        // 2. If null, fall back to dotenv (local dev)
-        if (key == null) {
-            key = ResumeAiBackendApplication.dotenv.get("OPENROUTER_API_KEY");
-        }
-
-        this.openRouterApiKey = key;
-
-        log.info("🔑 OPENROUTER_API_KEY loaded, length=" + (key != null ? key.length() : 0));
-    }
+    // 🔹 Gemini 2.0 Flash API endpoint
+    private final String geminiApiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+    private final String geminiApiKey;
 
     private static final Logger log = LoggerFactory.getLogger(ResumeServiceImpl.class);
 
+    public ResumeServiceImpl() {
+        // 🔑 Load Gemini API key from env or .env file
+        String key = System.getenv("GEMINI_API_KEY");
+        if (key == null) {
+            key = ResumeAiBackendApplication.dotenv.get("GEMINI_API_KEY");
+        }
+        this.geminiApiKey = key;
+        log.info("🔑 GEMINI_API_KEY loaded, length=" + (key != null ? key.length() : 0));
+    }
+
     @PostConstruct
     public void init() {
-        if (openRouterApiKey != null && !openRouterApiKey.isEmpty()) {
-            String masked = openRouterApiKey.substring(0, 6) + "..." +
-                    openRouterApiKey.substring(openRouterApiKey.length() - 4);
-            log.info("🔑 OPENROUTER_API_KEY loaded, length={}, value={}", openRouterApiKey.length(), masked);
+        if (geminiApiKey != null && !geminiApiKey.isEmpty()) {
+            String masked = geminiApiKey.substring(0, 6) + "..." + geminiApiKey.substring(geminiApiKey.length() - 4);
+            log.info("🔑 GEMINI_API_KEY is set, length={}, value={}", geminiApiKey.length(), masked);
         } else {
-            log.error("❌ OPENROUTER_API_KEY NOT FOUND! Please set it in .env or embed directly.");
+            log.error("❌ GEMINI_API_KEY NOT FOUND! Please set it in environment variables or .env.");
         }
     }
 
     @Override
     public Map<String, Object> generateResumeResponse(String userResumeDescription) {
-        String systemPrompt = "You are an expert resume JSON generator. " +
-                "Your only function is to convert user descriptions into a single, raw, valid JSON object. " +
-                "Adhere strictly to the following rules:\n" +
-                "1. Entire response MUST be JSON only. No extra text or markdown.\n" +
+        // 🔹 Construct the prompt for Gemini
+        String prompt = "You are an expert resume JSON generator. " +
+                "Your only function is to convert user descriptions into a single, valid JSON object. " +
+                "Strict rules:\n" +
+                "1. Entire response MUST be JSON only.\n" +
                 "2. Use double quotes (\") for all keys and strings.\n" +
-                "3. Follow this structure exactly: {\"personalInformation\":{\"fullName\":\"\",\"email\":\"\",\"phoneNumber\":\"\"},\"summary\":\"\",\"skills\":[{\"title\":\"\",\"level\":\"\"}],...}";
+                "3. Follow this exact structure: {\"personalInformation\": {...}, \"summary\": \"\", \"skills\": [...], ...}" +
+                "\nUser description: " + userResumeDescription;
 
+        // 🔹 Prepare request body
         JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "openai/gpt-oss-120b:free");
+        JSONArray contents = new JSONArray();
+        JSONObject contentItem = new JSONObject();
+        JSONArray parts = new JSONArray();
+        JSONObject part = new JSONObject();
+        part.put("text", prompt);
+        parts.put(part);
+        contentItem.put("parts", parts);
+        contents.put(contentItem);
+        requestBody.put("contents", contents);
 
-        JSONArray messages = new JSONArray();
-        messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
-        messages.put(new JSONObject().put("role", "user").put("content", userResumeDescription));
-        requestBody.put("messages", messages);
-
+        // 🔹 Prepare headers
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + openRouterApiKey);
         headers.set("Content-Type", "application/json");
+        headers.set("X-goog-api-key", geminiApiKey); // Gemini expects API key here
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);
         RestTemplate restTemplate = new RestTemplate();
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(openRouterApiUrl, HttpMethod.POST, entity, String.class);
-            return parseOpenRouterApiResponse(response.getBody());
+            // 🔹 Call Gemini API
+            ResponseEntity<String> response = restTemplate.exchange(geminiApiUrl, HttpMethod.POST, entity, String.class);
+            // 🔹 Parse Gemini response
+            return parseGeminiContentResponse(response.getBody());
         } catch (Exception e) {
-            log.error("❌ Error calling OpenRouter API", e);
+            log.error("❌ Error calling Gemini API", e);
             return Map.of("error", "Failed to generate resume: " + e.getMessage());
         }
     }
 
-    private Map<String, Object> parseOpenRouterApiResponse(String responseBody) {
-        Map<String, Object> jsonResponse = new HashMap<>();
-        System.out.println("Raw OpenRouter API response: " + responseBody);
+    /**
+     * 🔹 Parses the Gemini 2.0 Flash API response
+     * Extracts the JSON content from nested `content → parts → text`
+     */
+    private Map<String, Object> parseGeminiContentResponse(String responseBody) {
+        Map<String, Object> result = new HashMap<>();
+        System.out.println("Raw Gemini API response: " + responseBody);
 
         try {
             JSONObject json = new JSONObject(responseBody);
-            JSONArray choices = json.optJSONArray("choices");
+            JSONArray candidates = json.optJSONArray("candidates");
 
-            if (choices != null && !choices.isEmpty()) {
-                JSONObject choice = choices.getJSONObject(0);
-                JSONObject message = choice.optJSONObject("message");
+            if (candidates != null && candidates.length() > 0) {
+                JSONObject candidate = candidates.getJSONObject(0);
+                JSONObject content = candidate.getJSONObject("content");
+                JSONArray parts = content.getJSONArray("parts");
 
-                if (message != null) {
-                    String resumeJsonString = message.optString("content");
-                    if (resumeJsonString != null && !resumeJsonString.isEmpty()) {
-                        // Try to parse content as JSON
-                        try {
-                            JSONObject resumeJson = new JSONObject(resumeJsonString);
-                            jsonResponse.put("resume", resumeJson.toMap());
-                        } catch (Exception ex) {
-                            // If content is plain text, return it as-is
-                            log.warn("⚠️ API returned non-JSON content. Returning as text.");
-                            jsonResponse.put("resumeText", resumeJsonString);
-                        }
-                        return jsonResponse;
-                    }
+                // ✅ Extract text from first part
+                String text = parts.getJSONObject(0).getString("text");
+
+                // ✅ Remove code fences ```json ... ```
+                text = text.replaceAll("```json", "").replaceAll("```", "").trim();
+
+                try {
+                    // ✅ Convert cleaned text to JSON
+                    JSONObject resumeJson = new JSONObject(text);
+                    result.put("resume", resumeJson.toMap());
+                } catch (Exception ex) {
+                    // ⚠️ If text is not valid JSON, fallback
+                    log.warn("⚠️ Gemini API returned text that is not JSON. Returning raw text.");
+                    result.put("resumeText", text);
                 }
+
+                return result;
             }
 
-            // If 'choices' missing or empty, check for error message in response
+            // 🔹 No candidates returned
             String errorMessage = json.optString("error", "Unknown error from API");
-            jsonResponse.put("error", "Invalid API response: " + errorMessage);
+            result.put("error", "Invalid API response: " + errorMessage);
 
         } catch (Exception e) {
-            log.error("❌ Failed to parse OpenRouter API response", e);
-            // Return raw response as fallback
-            jsonResponse.put("error", "Failed to parse API response. Returning raw text.");
-            jsonResponse.put("rawResponse", responseBody);
+            log.error("❌ Failed to parse Gemini API response", e);
+            result.put("error", "Failed to parse API response. Returning raw text.");
+            result.put("rawResponse", responseBody);
         }
 
-        return jsonResponse;
+        return result;
     }
 }
