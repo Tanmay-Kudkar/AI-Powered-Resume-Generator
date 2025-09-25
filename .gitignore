@@ -25,24 +25,24 @@ pnpm-debug.log*
 # ---------------------------
 # Node / React (Frontend)
 # ---------------------------
-frontend/node_modules/
-frontend/.cache/
-frontend/build/
-frontend/.env
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
+node_modules/
+.cache/
+build/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # ---------------------------
 # Java / Spring Boot (Backend)
 # ---------------------------
-backend/target/
-backend/.env
-backend/.idea/
-backend/.classpath
-backend/.project
-backend/.settings/
+target/
+.env
+.idea/
+.classpath
+.project
+.settings/
 *.class
 *.war
 *.ear
