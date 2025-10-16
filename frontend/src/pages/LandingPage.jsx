@@ -34,6 +34,12 @@ const LandingPage = () => {
     theme === "dark"
       ? "bg-neutral text-neutral-content"
       : "bg-gray-100 text-gray-800 shadow-lg rounded-t-xl border-t border-gray-200";
+  const footerNameClass = theme === "dark" ? "text-white" : "text-blue-700";
+  const footerTextClass = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const footerLinkClass =
+    theme === "dark"
+      ? "link link-hover text-blue-300 hover:text-blue-200"
+      : "link link-hover text-blue-600 hover:text-blue-700";
 
   // Animation settings for light/dark
   const blobBlueAnim =
@@ -333,7 +339,7 @@ const LandingPage = () => {
             <h4 className="footer-title font-bold">
               AI Powered Resume Generator
             </h4>
-            <p className="opacity-80">
+            <p className={`opacity-80 ${footerTextClass}`}>
               The easiest way to create a standout resume with AI assistance.
             </p>
           </div>
@@ -342,46 +348,44 @@ const LandingPage = () => {
             <h4 className="footer-title mb-4 font-bold">Quick Links</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/about" className="link link-hover">
+                <Link to="/about" className={footerLinkClass}>
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="link link-hover">
+                <Link to="/contact" className={footerLinkClass}>
                   Contact
                 </Link>
               </li>
               <li>
-                <a href="#" className="link link-hover">
+                <a href="#" className={footerLinkClass}>
                   Privacy Policy
                 </a>
               </li>
             </ul>
           </div>
           {/* Footer Copyright */}
-          <div className="flex flex-col justify-between">
-            <p className="text-sm">
+          <div className="flex flex-col justify-between font-mono text-sm md:text-base">
+            <p className={`text-sm ${footerTextClass}`}>
               &copy; {new Date().getFullYear()}
-              <div className="mt-2 mb-2">
-                <span className="font-bold text-white block">
+              <div className="mt-2 mb-2 space-y-1">
+                <span className={`font-bold block ${footerNameClass}`}>
                   Tanmay Vijay Kudkar
                 </span>
-                <span className="font-bold text-white block">
+                <span className={`font-bold block ${footerNameClass}`}>
                   Ritikesh Nayak
                 </span>
-                <span className="font-bold text-white block">Atharva Raut</span>
-                <span className="font-bold text-white block">
+                <span className={`font-bold block ${footerNameClass}`}>
+                  Atharva Raut
+                </span>
+                <span className={`font-bold block ${footerNameClass}`}>
                   Pravin Rathod
                 </span>
-                <span className="font-bold text-white block">
+                <span className={`font-bold block ${footerNameClass}`}>
                   (Team AI Powered Resume Generator)
                 </span>
               </div>
-              <span
-                className={`text-xs opacity-80 ${
-                  theme === "dark" ? "text-white" : ""
-                }`}
-              >
+              <span className={`text-xs opacity-80 ${footerTextClass}`}>
                 All Rights Reserved by us.
               </span>
             </p>

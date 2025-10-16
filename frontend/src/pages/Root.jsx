@@ -28,7 +28,7 @@ function Root() {
             </p>
           </div>
           {/* Team Members */}
-          <div className="mb-4">
+          <div className="mb-4 font-mono text-sm md:text-base">
             <ul className="space-y-1 mt-2">
               <li>
                 <span className="font-bold text-blue-400">

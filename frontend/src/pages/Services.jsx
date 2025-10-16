@@ -133,7 +133,7 @@ function Services() {
               } p-8 rounded-2xl shadow-2xl text-center animate-popup`}
             >
               <h2 className="text-2xl font-bold mb-2">🚀 Thanks!</h2>
-              <p>We'll notify you when new services are available.</p>
+              <p>We&#39;ll notify you when new services are available.</p>
             </div>
             <style>
               {`
