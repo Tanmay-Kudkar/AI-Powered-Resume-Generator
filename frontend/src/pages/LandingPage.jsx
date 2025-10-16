@@ -93,7 +93,6 @@ const LandingPage = () => {
                 theme === "light" ? "text-gray-900" : "text-white"
               }`}
               style={{
-                // Remove extra textShadow for light theme
                 textShadow:
                   theme === "light"
                     ? "none"
@@ -108,7 +107,7 @@ const LandingPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               className={`py-6 text-xl ${
-                theme === "light" ? "text-gray-800" : "text-white"
+                theme === "light" ? "text-gray-800" : "text-gray-100"
               }`}
               style={{
                 textShadow:
@@ -153,7 +152,7 @@ const LandingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className={`text-4xl font-bold text-center mb-12 ${
-              theme === "light" ? "text-blue-700" : "text-white"
+              theme === "light" ? "text-blue-700" : "text-gray-100"
             }`}
           >
             Why Choose Us?
@@ -191,25 +190,13 @@ const LandingPage = () => {
                 className={`card shadow-lg hover:shadow-xl transition rounded-2xl ${
                   theme === "light"
                     ? "bg-white border border-blue-100"
-                    : "bg-[#23272f] border-none"
+                    : "bg-base-200"
                 }`}
               >
                 <div className="card-body text-center">
                   <div className="text-6xl mb-4">{f.icon}</div>
-                  <h3
-                    className={`card-title text-xl mb-2 ${
-                      theme === "light" ? "text-blue-700" : "text-white"
-                    }`}
-                  >
-                    {f.title}
-                  </h3>
-                  <p
-                    className={`text-sm ${
-                      theme === "light" ? "text-gray-700" : "text-gray-300"
-                    }`}
-                  >
-                    {f.desc}
-                  </p>
+                  <h3 className="card-title text-xl mb-2">{f.title}</h3>
+                  <p className="text-sm opacity-80">{f.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -229,7 +216,7 @@ const LandingPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className={`text-4xl font-bold text-center mb-12 ${
-              theme === "light" ? "text-blue-700" : "text-white"
+              theme === "light" ? "text-blue-700" : "text-gray-100"
             }`}
           >
             Loved by Professionals
@@ -269,8 +256,8 @@ const LandingPage = () => {
               >
                 <div className="card-body">
                   <p
-                    className={`italic mb-4 ${
-                      theme === "light" ? "text-gray-900" : "text-white"
+                    className={`italic ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     &quot;{t.text}&quot;
@@ -282,20 +269,8 @@ const LandingPage = () => {
                       </div>
                     </div>
                     <div className="ml-4">
-                      <h4
-                        className={`font-bold ${
-                          theme === "light" ? "text-blue-700" : "text-white"
-                        }`}
-                      >
-                        {t.name}
-                      </h4>
-                      <p
-                        className={`text-sm ${
-                          theme === "light" ? "text-gray-700" : "text-white"
-                        }`}
-                      >
-                        {t.role}
-                      </p>
+                      <h4 className="font-bold">{t.name}</h4>
+                      <p className="text-sm opacity-80">{t.role}</p>
                     </div>
                   </div>
                 </div>
@@ -319,12 +294,16 @@ const LandingPage = () => {
         >
           <h2
             className={`text-5xl font-bold mb-6 ${
-              theme === "light" ? "text-pink-700" : ""
+              theme === "light" ? "text-pink-700" : "text-gray-100"
             }`}
           >
             Ready to Land Your Dream Job?
           </h2>
-          <p className="mb-8 text-lg opacity-80">
+          <p
+            className={`mb-8 text-lg opacity-80 ${
+              theme === "dark" ? "text-gray-300" : ""
+            }`}
+          >
             Join thousands of users who built professional resumes with AI.
           </p>
           <motion.div whileHover={{ scale: 1.08 }}>
@@ -382,25 +361,27 @@ const LandingPage = () => {
           {/* Footer Copyright */}
           <div className="flex flex-col justify-between">
             <p className="text-sm">
-              © {new Date().getFullYear()}{" "}
+              &copy; {new Date().getFullYear()}
               <div className="mt-2 mb-2">
-                <span className="font-bold text-blue-600 block">
+                <span className="font-bold text-white block">
                   Tanmay Vijay Kudkar
                 </span>
-                <span className="font-bold text-blue-600 block">
+                <span className="font-bold text-white block">
                   Ritikesh Nayak
                 </span>
-                <span className="font-bold text-blue-600 block">
-                  Atharva Raut
-                </span>
-                <span className="font-bold text-blue-600 block">
+                <span className="font-bold text-white block">Atharva Raut</span>
+                <span className="font-bold text-white block">
                   Pravin Rathod
                 </span>
-                <span className="font-bold text-blue-600 block">
+                <span className="font-bold text-white block">
                   (Team AI Powered Resume Generator)
                 </span>
               </div>
-              <span className="text-xs opacity-80">
+              <span
+                className={`text-xs opacity-80 ${
+                  theme === "dark" ? "text-white" : ""
+                }`}
+              >
                 All Rights Reserved by us.
               </span>
             </p>

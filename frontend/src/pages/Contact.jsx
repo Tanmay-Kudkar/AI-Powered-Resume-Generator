@@ -1,13 +1,26 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 function Contact() {
   const [showPopup, setShowPopup] = useState(false);
   const [showTick, setShowTick] = useState(false);
+  const [theme, setTheme] = useState(
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") || "light"
+      : "light"
+  );
 
   const nameRef = useRef();
   const emailRef = useRef();
   const messageRef = useRef();
   const hasSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    const handler = () =>
+      setTheme(document.documentElement.getAttribute("data-theme") || "light");
+    const observer = new MutationObserver(handler);
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,7 +35,7 @@ function Contact() {
     emailRef.current.value = "";
     messageRef.current.value = "";
 
-  // Hide popup after 1.5 seconds, then show tick for 2.5 seconds
+    // Hide popup after 1.5 seconds, then show tick for 2.5 seconds
     setTimeout(() => {
       setShowPopup(false);
       setShowTick(true);
@@ -35,17 +48,41 @@ function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center px-6 py-16 relative">
+    <div
+      className={`min-h-screen flex items-center justify-center px-6 py-16 relative ${
+        theme === "dark"
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900"
+      }`}
+    >
       {/* Form Container */}
-      <div className="max-w-4xl w-full bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 p-10">
-        <h1 className="text-5xl font-extrabold text-center mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+      <div
+        className={`max-w-4xl w-full ${
+          theme === "dark"
+            ? "bg-gray-900/80 border-gray-700"
+            : "bg-white/70 border-gray-200"
+        } backdrop-blur-lg rounded-2xl shadow-xl border p-10`}
+      >
+        <h1
+          className={`text-5xl font-extrabold text-center mb-6 bg-gradient-to-r ${
+            theme === "dark"
+              ? "from-blue-400 to-indigo-400"
+              : "from-blue-600 to-indigo-600"
+          } bg-clip-text text-transparent`}
+        >
           Contact Us
         </h1>
-        <p className="text-center text-lg text-gray-700 mb-10">
+        <p
+          className={`text-center text-lg mb-10 ${
+            theme === "dark" ? "text-gray-200" : "text-gray-700"
+          }`}
+        >
           Have questions or feedback? Get in touch!{" "}
           <a
             href="mailto:support@resumegenerator.com"
-            className="text-blue-600 font-semibold hover:underline"
+            className={`font-semibold hover:underline ${
+              theme === "dark" ? "text-blue-300" : "text-blue-600"
+            }`}
           >
             support@resumegenerator.com
           </a>
@@ -56,7 +93,9 @@ function Contact() {
           <div>
             <label
               htmlFor="name"
-              className="block mb-2 font-semibold text-gray-700"
+              className={`block mb-2 font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Name
             </label>
@@ -65,20 +104,22 @@ function Contact() {
               id="name"
               type="text"
               placeholder="✨ Enter your full name"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 
-                         placeholder:text-gray-400 placeholder:italic placeholder:opacity-75
-                         text-gray-800 bg-white/90
-                         focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none 
-                         transition duration-300"
+              className={`w-full rounded-xl border px-4 py-3 placeholder:italic placeholder:opacity-75 transition duration-300
+                ${
+                  theme === "dark"
+                    ? "border-gray-700 text-gray-100 bg-gray-800/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                    : "border-gray-300 text-gray-800 bg-white/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                }`}
               required
             />
           </div>
-
           {/* Email Input */}
           <div>
             <label
               htmlFor="email"
-              className="block mb-2 font-semibold text-gray-700"
+              className={`block mb-2 font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Email
             </label>
@@ -87,20 +128,22 @@ function Contact() {
               id="email"
               type="email"
               placeholder="📧 Your professional email"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 
-                         placeholder:text-gray-400 placeholder:italic placeholder:opacity-75
-                         text-gray-800 bg-white/90
-                         focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none 
-                         transition duration-300"
+              className={`w-full rounded-xl border px-4 py-3 placeholder:italic placeholder:opacity-75 transition duration-300
+                ${
+                  theme === "dark"
+                    ? "border-gray-700 text-gray-100 bg-gray-800/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                    : "border-gray-300 text-gray-800 bg-white/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                }`}
               required
             />
           </div>
-
           {/* Message Input */}
           <div>
             <label
               htmlFor="message"
-              className="block mb-2 font-semibold text-gray-700"
+              className={`block mb-2 font-semibold ${
+                theme === "dark" ? "text-gray-200" : "text-gray-700"
+              }`}
             >
               Message
             </label>
@@ -109,25 +152,25 @@ function Contact() {
               id="message"
               placeholder="💬 Share your thoughts with us..."
               rows="5"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 
-                         placeholder:text-gray-400 placeholder:italic placeholder:opacity-75
-                         text-gray-800 bg-white/90
-                         focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none 
-                         transition duration-300"
+              className={`w-full rounded-xl border px-4 py-3 placeholder:italic placeholder:opacity-75 transition duration-300
+                ${
+                  theme === "dark"
+                    ? "border-gray-700 text-gray-100 bg-gray-800/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                    : "border-gray-300 text-gray-800 bg-white/90 placeholder:text-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                }`}
               required
             ></textarea>
           </div>
-
           {/* Submit Button */}
           <div className="text-center">
             <button
               type="submit"
-              className="px-10 py-3 rounded-xl font-semibold text-white 
-                         bg-gradient-to-r from-blue-500 to-indigo-600 
-                         shadow-lg hover:shadow-xl hover:scale-105 
-                         transform transition-all duration-300
-                         focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
-                         hover:brightness-110"
+              className={`px-10 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:scale-105 transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 hover:brightness-110
+                ${
+                  theme === "dark"
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+                    : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+                }`}
             >
               🚀 Send Message
             </button>

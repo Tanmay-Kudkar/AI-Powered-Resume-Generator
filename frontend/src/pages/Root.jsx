@@ -10,7 +10,10 @@ function Root() {
         <Outlet />
       </main>
 
-      <footer className="footer bg-neutral text-neutral-content py-8 mt-8 border-t border-neutral-focus">
+      <footer
+        className="footer bg-neutral text-neutral-content py-8 mt-8 border-t border-neutral-focus"
+        style={{ position: "relative", zIndex: 10 }}
+      >
         <div className="container mx-auto flex flex-col items-start px-4">
           {/* Branding */}
           <div>
