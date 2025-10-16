@@ -1,11 +1,13 @@
-// - Enhanced with Framer Motion Animations & Visuals
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FaBrain, FaTrash, FaPaperPlane, FaPlusCircle } from "react-icons/fa";
 import { BiBook } from "react-icons/bi";
 import { useForm, useFieldArray } from "react-hook-form";
-import { motion } from "framer-motion"; // 🔥 For Animations
+import { motion } from "framer-motion";
 import Resume from "../components/Resume";
+import ResumeTemplate1 from "../components/ResumeTemplate1";
+import ResumeTemplate2 from "../components/ResumeTemplate2";
+import ResumeTemplate3 from "../components/ResumeTemplate3";
 import { generateResume } from "../api/ResumeService";
 
 const defaultResume = {
@@ -17,6 +19,7 @@ const defaultResume = {
     linkedin: "",
     gitHub: "",
     portfolio: "",
+    profilePhoto: "", // <-- Add this line
   },
   summary: "",
   skills: [],
@@ -28,6 +31,13 @@ const defaultResume = {
   interests: [],
 };
 
+const resumeTemplates = [
+  { label: "Classic Blue (Default)", value: "default" },
+  { label: "Modern Minimal", value: "template1" },
+  { label: "Elegant Dark", value: "template2" },
+  { label: "Professional Gray", value: "template3" },
+];
+
 const GenerateResume = () => {
   const [data, setData] = useState(null);
   const [description, setDescription] = useState("");
@@ -36,20 +46,21 @@ const GenerateResume = () => {
   const [showFormUI, setShowFormUI] = useState(false);
   const [showResumeUI, setShowResumeUI] = useState(false);
   const [showPromptInput, setShowPromptInput] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState("default");
 
-  const { register, handleSubmit, control, reset } = useForm({
+  const { register, handleSubmit, control, reset, setValue, watch } = useForm({
     defaultValues: defaultResume,
   });
 
-  const makeFieldArray = (name) => useFieldArray({ control, name });
+  const useFieldArrayHelper = (name) => useFieldArray({ control, name });
 
-  const skillsFields = makeFieldArray("skills");
-  const experienceFields = makeFieldArray("experience");
-  const educationFields = makeFieldArray("education");
-  const certificationsFields = makeFieldArray("certifications");
-  const projectsFields = makeFieldArray("projects");
-  const languagesFields = makeFieldArray("languages");
-  const interestsFields = makeFieldArray("interests");
+  const skillsFields = useFieldArrayHelper("skills");
+  const experienceFields = useFieldArrayHelper("experience");
+  const educationFields = useFieldArrayHelper("education");
+  const certificationsFields = useFieldArrayHelper("certifications");
+  const projectsFields = useFieldArrayHelper("projects");
+  const languagesFields = useFieldArrayHelper("languages");
+  const interestsFields = useFieldArrayHelper("interests");
 
   useEffect(() => {
     const ensureNotEmpty = (fieldArray, template) => {
@@ -59,15 +70,30 @@ const GenerateResume = () => {
     };
 
     ensureNotEmpty(skillsFields, { title: "", level: "" });
-    ensureNotEmpty(certificationsFields, { title: "", issuingOrganization: "", year: "" });
-    ensureNotEmpty(projectsFields, { title: "", description: "", technologiesUsed: "", githubLink: "" });
+    ensureNotEmpty(certificationsFields, {
+      title: "",
+      issuingOrganization: "",
+      year: "",
+    });
+    ensureNotEmpty(projectsFields, {
+      title: "",
+      description: "",
+      technologiesUsed: "",
+      githubLink: "",
+    });
     ensureNotEmpty(languagesFields, { name: "" });
     ensureNotEmpty(interestsFields, { name: "" });
-  }, []);
+  }, [
+    skillsFields,
+    certificationsFields,
+    projectsFields,
+    languagesFields,
+    interestsFields,
+  ]);
 
   const handleGenerate = async () => {
     if (!description.trim()) {
-      toast.error("Please enter a description.");
+      toast.error("Please enter a resume description.");
       return;
     }
 
@@ -124,7 +150,10 @@ const GenerateResume = () => {
         >
           {keys.map((key) => (
             <div key={key}>
-              {renderInput(`${name}.${index}.${key}`, key.charAt(0).toUpperCase() + key.slice(1))}
+              {renderInput(
+                `${name}.${index}.${key}`,
+                key.charAt(0).toUpperCase() + key.slice(1)
+              )}
             </div>
           ))}
           <button
@@ -149,6 +178,19 @@ const GenerateResume = () => {
     </div>
   );
 
+  // Handle profile photo upload
+  const handleProfilePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setValue("personalInformation.profilePhoto", reader.result, {
+        shouldDirty: true,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="mt-5 p-10 flex flex-col gap-3 items-center justify-center">
       {showPromptInput && (
@@ -165,7 +207,9 @@ const GenerateResume = () => {
           >
             <FaBrain className="text-pink-500 text-6xl mb-4 mx-auto" />
           </motion.div>
-          <h1 className="text-4xl font-bold mb-6">AI Resume Description Input</h1>
+          <h1 className="text-4xl font-bold mb-6">
+            AI Resume Description Input
+          </h1>
           <textarea
             disabled={loading}
             className="textarea textarea-bordered w-full h-48 mb-6 resize-none"
@@ -204,6 +248,25 @@ const GenerateResume = () => {
           <h1 className="text-4xl font-bold mb-6 flex items-center justify-center gap-2">
             <BiBook className="text-accent" /> Resume Form
           </h1>
+          {/* Template Selector */}
+          <div className="form-control w-full mb-6">
+            <label className="label">
+              <span className="label-text font-semibold">
+                Choose Resume Template
+              </span>
+            </label>
+            <select
+              className="select select-bordered w-full"
+              value={selectedTemplate}
+              onChange={(e) => setSelectedTemplate(e.target.value)}
+            >
+              {resumeTemplates.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="p-6 space-y-6 bg-base-200 rounded-lg"
@@ -211,11 +274,35 @@ const GenerateResume = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderInput("personalInformation.fullName", "Full Name")}
               {renderInput("personalInformation.email", "Email", "email")}
-              {renderInput("personalInformation.phoneNumber", "Phone Number", "tel")}
+              {renderInput(
+                "personalInformation.phoneNumber",
+                "Phone Number",
+                "tel"
+              )}
               {renderInput("personalInformation.location", "Location")}
               {renderInput("personalInformation.linkedin", "LinkedIn", "url")}
               {renderInput("personalInformation.gitHub", "GitHub", "url")}
               {renderInput("personalInformation.portfolio", "Portfolio", "url")}
+              {/* Profile Photo Upload */}
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text">Profile Photo</span>
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePhotoChange}
+                  className="file-input file-input-bordered w-full"
+                />
+                {/* Preview */}
+                {watch("personalInformation.profilePhoto") && (
+                  <img
+                    src={watch("personalInformation.profilePhoto")}
+                    alt="Profile Preview"
+                    className="mt-2 w-24 h-24 rounded-full object-cover border-2 border-blue-300"
+                  />
+                )}
+              </div>
             </div>
 
             <h3 className="text-xl font-semibold">Summary</h3>
@@ -225,22 +312,42 @@ const GenerateResume = () => {
               rows={4}
             ></textarea>
 
-            {renderFieldArray(skillsFields, "Skills", "skills", ["title", "level"])}
+            {renderFieldArray(skillsFields, "Skills", "skills", [
+              "title",
+              "level",
+            ])}
             {renderFieldArray(experienceFields, "Experience", "experience", [
-              "jobTitle", "company", "location", "duration", "responsibility",
+              "jobTitle",
+              "company",
+              "location",
+              "duration",
+              "responsibility",
             ])}
             {renderFieldArray(educationFields, "Education", "education", [
-              "degree", "university", "location", "graduationYear",
+              "degree",
+              "university",
+              "location",
+              "graduationYear",
             ])}
-            {renderFieldArray(certificationsFields, "Certifications", "certifications", [
-              "title", "issuingOrganization", "year",
-            ])}
+            {renderFieldArray(
+              certificationsFields,
+              "Certifications",
+              "certifications",
+              ["title", "issuingOrganization", "year"]
+            )}
             {renderFieldArray(projectsFields, "Projects", "projects", [
-              "title", "description", "technologiesUsed", "githubLink",
+              "title",
+              "description",
+              "technologiesUsed",
+              "githubLink",
             ])}
             <div className="flex gap-3">
-              {renderFieldArray(languagesFields, "Languages", "languages", ["name"])}
-              {renderFieldArray(interestsFields, "Interests", "interests", ["name"])}
+              {renderFieldArray(languagesFields, "Languages", "languages", [
+                "name",
+              ])}
+              {renderFieldArray(interestsFields, "Interests", "interests", [
+                "name",
+              ])}
             </div>
 
             <motion.button
@@ -262,7 +369,17 @@ const GenerateResume = () => {
           className="w-full flex flex-col items-center"
         >
           <div className="bg-white shadow-lg p-10 rounded-xl w-full max-w-4xl">
-            <Resume data={data} />
+            {/* Render selected template */}
+            {selectedTemplate === "default" && <Resume data={data} />}
+            {selectedTemplate === "template1" && (
+              <ResumeTemplate1 data={data} />
+            )}
+            {selectedTemplate === "template2" && (
+              <ResumeTemplate2 data={data} />
+            )}
+            {selectedTemplate === "template3" && (
+              <ResumeTemplate3 data={data} />
+            )}
           </div>
           <div className="flex mt-5 justify-center gap-2">
             <button

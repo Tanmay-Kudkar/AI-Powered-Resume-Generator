@@ -1,13 +1,13 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import "daisyui/dist/full.css";
 import { FaGithub, FaLinkedin, FaPhone, FaEnvelope } from "react-icons/fa";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 
 const Resume = ({ data }) => {
-  const resumeRef = useRef(null); // Reference for the resume container
+  const resumeRef = useRef(null);
 
-  // Destructure data with safe defaults
+  // Data with safe defaults
   const {
     personalInformation = {},
     summary = "A passionate software engineer eager to contribute expertise to innovative projects.",
@@ -21,11 +21,7 @@ const Resume = ({ data }) => {
     interests = [],
   } = data || {};
 
-  /**
-   * Downloads the resume as a single-page image-based PDF.
-   * This is a fallback if the user prefers direct download
-   * instead of print dialog.
-   */
+  // Generate and download PDF from resume DOM
   const handleDownloadPdf = () => {
     if (!resumeRef.current) return;
 
@@ -35,7 +31,7 @@ const Resume = ({ data }) => {
     );
     if (!fileName) return;
 
-    // Convert resume DOM element to PNG image
+    // Conversion of resume DOM element to PNG image
     toPng(resumeRef.current, { quality: 1.0, backgroundColor: "#ffffff" })
       .then((dataUrl) => {
         const pdf = new jsPDF("p", "mm", "a4");
@@ -50,11 +46,7 @@ const Resume = ({ data }) => {
       .catch((err) => console.error("Error generating PDF", err));
   };
 
-  /**
-   * Opens Chrome's built-in print dialog.
-   * This solves the issue of splitting sections into multiple pages
-   * because the browser automatically paginates properly.
-   */
+  // Trigger browser print dialog
   const handlePrint = () => {
     window.print();
   };
@@ -74,8 +66,19 @@ const Resume = ({ data }) => {
         ref={resumeRef}
         className="max-w-5xl mx-auto shadow-2xl rounded-lg overflow-hidden grid grid-cols-3 bg-white text-gray-900 border border-gray-200 print:border-0 print:shadow-none"
       >
-        {/* ======================= SIDEBAR ======================= */}
+        {/* SIDEBAR */}
         <aside className="bg-gradient-to-b from-blue-600 to-blue-800 text-white p-6 space-y-6">
+          {/* Profile Photo */}
+          {personalInformation.profilePhoto && (
+            <div className="flex justify-center mb-4">
+              <img
+                src={personalInformation.profilePhoto}
+                alt="Profile"
+                className="w-28 h-28 rounded-full object-cover border-4 border-blue-300 shadow-lg"
+                // If base64, it will work; if URL, it will work
+              />
+            </div>
+          )}
           {/* Name & Location */}
           <div className="text-center">
             <h1 className="text-3xl font-bold leading-tight">
@@ -154,7 +157,7 @@ const Resume = ({ data }) => {
           )}
         </aside>
 
-        {/* ======================= MAIN CONTENT ======================= */}
+        {/*MAIN CONTENT*/}
         <main className="col-span-2 p-6 space-y-6">
           {/* Summary Section */}
           <section>
@@ -302,6 +305,12 @@ const Resume = ({ data }) => {
       </div>
     </>
   );
+};
+
+import PropTypes from "prop-types";
+
+Resume.propTypes = {
+  data: PropTypes.object,
 };
 
 export default Resume;

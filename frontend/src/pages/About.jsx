@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 
 function About() {
@@ -17,7 +16,7 @@ function About() {
             About Us
           </h1>
           <p className="text-lg mb-6 text-gray-600 leading-relaxed">
-            Welcome to <span className="font-semibold text-indigo-600">AI Resume Maker</span>, 
+            Welcome to <span className="font-semibold text-indigo-600">AI Powered Resume Generator</span>, 
             your one-stop solution to build a professional resume in minutes. 
             We use advanced AI to create polished, job-winning resumes tailored 
             to your career goals.
@@ -40,7 +39,7 @@ function About() {
           </motion.a>
         </motion.div>
 
-        {/* Right Side: Image (no dancing, just smooth hover glow) */}
+        {/* Right Side: smooth hover glow */}
         <motion.div
           className="flex justify-center"
           initial={{ opacity: 0, y: 40 }}
@@ -50,7 +49,7 @@ function About() {
         >
           <motion.img
             src="https://img.freepik.com/free-vector/resume-writing-concept-illustration_114360-4110.jpg"
-            alt="About AI Resume Maker"
+            alt="About AI Powered Resume Generator"
             className="rounded-2xl shadow-lg w-full max-w-md cursor-pointer"
             whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(99, 102, 241, 0.3)" }}
             transition={{ type: "spring", stiffness: 150 }}

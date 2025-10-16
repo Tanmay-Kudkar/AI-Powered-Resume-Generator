@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 function Contact() {
   const [showPopup, setShowPopup] = useState(false);
@@ -22,7 +22,7 @@ function Contact() {
     emailRef.current.value = "";
     messageRef.current.value = "";
 
-    // Sequence: popup → tick → reset
+  // Hide popup after 1.5 seconds, then show tick for 2.5 seconds
     setTimeout(() => {
       setShowPopup(false);
       setShowTick(true);
@@ -31,7 +31,7 @@ function Contact() {
         setShowTick(false);
         hasSubmittedRef.current = false;
       }, 2500);
-    }, 2000);
+    }, 1500);
   };
 
   return (
@@ -44,17 +44,20 @@ function Contact() {
         <p className="text-center text-lg text-gray-700 mb-10">
           Have questions or feedback? Get in touch!{" "}
           <a
-            href="mailto:kudkartanmay25@gmail.com"
+            href="mailto:support@resumegenerator.com"
             className="text-blue-600 font-semibold hover:underline"
           >
-            kudkartanmay25@gmail.com
+            support@resumegenerator.com
           </a>
         </p>
 
         <form className="grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
           {/* Name Input */}
           <div>
-            <label htmlFor="name" className="block mb-2 font-semibold text-gray-700">
+            <label
+              htmlFor="name"
+              className="block mb-2 font-semibold text-gray-700"
+            >
               Name
             </label>
             <input
@@ -73,7 +76,10 @@ function Contact() {
 
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block mb-2 font-semibold text-gray-700">
+            <label
+              htmlFor="email"
+              className="block mb-2 font-semibold text-gray-700"
+            >
               Email
             </label>
             <input
@@ -92,7 +98,10 @@ function Contact() {
 
           {/* Message Input */}
           <div>
-            <label htmlFor="message" className="block mb-2 font-semibold text-gray-700">
+            <label
+              htmlFor="message"
+              className="block mb-2 font-semibold text-gray-700"
+            >
               Message
             </label>
             <textarea
@@ -130,8 +139,12 @@ function Contact() {
       {showPopup && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white/80 backdrop-blur-lg p-10 rounded-3xl shadow-2xl text-center animate-popup">
-            <h2 className="text-3xl font-bold mb-2 text-gray-800">✨ We are Cooperative!</h2>
-            <p className="text-gray-600">Thank you for reaching out. We'll get back to you soon!</p>
+            <h2 className="text-3xl font-bold mb-2 text-gray-800">
+              ✨ We are Cooperative!
+            </h2>
+            <p className="text-gray-600">
+              Thank you for reaching out. We&apos;ll get back to you soon!
+            </p>
           </div>
         </div>
       )}
